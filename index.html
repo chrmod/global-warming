@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>Global Temperature</title>
+  <script src="ExcelFormattedGISTEMPData2JS.js"></script>
+  <style>
+    #chart {
+      position: relative;
+      margin: 50px auto auto auto;
+      border: 1px solid black;
+      height: 300px;
+    }
+
+    #chart img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      filter: grayscale(100%);
+      opacity: 0.3;
+    }
+
+    .bar {
+      display: inline-block;
+      height: 100%;
+      width: 4px;
+    }
+
+    .part-bar {
+      display: inline-block;
+      width: 100%;
+      float: left;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    /* tooltip library from: http://webroad.pl/html5-css3/432-tworzymy-tooltip-wykorzystujac-tylko-i-wylacznie-css3-i-html5 */
+    .tool {
+        position: relative;
+    } 
+     
+    .tool::before {
+        content: attr(tooltip);
+        font-size: 14px;
+        position: absolute;
+        z-index: 999;
+        white-space: nowrap;
+        bottom: 9999px;
+        left: 50%;
+        background: gray;
+        color: #fff;
+        padding: 4px 5px;
+        opacity: 0; 
+     
+        -webkit-border-radius: 3px; 
+        -o-border-radius: 3px;
+        -moz-border-radius: 3px; 
+        border-radius: 3px;
+    } 
+     
+    .tool:hover::before {
+        opacity: 1;
+        bottom: -35px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chart"></div>
+  <br/><br/>
+  <div class="center">
+    <button onclick="draw(['Glob']);">global</button>
+    <button onclick="draw(['NHem', 'SHem']);">hemis</button>
+    <button onclick="draw(['24N-90N', '24S-24N', '90S-24S']);">3lanes</button>
+    <button onclick="draw(['64N-90N', '44N-64N', '24N-44N', 'EQU-24N', '24S-EQU', '44S-24S', '64S-44S', '90S-64S']);">8lanes</button>
+  </div>
+  <script>
+    var measurements = []
+    data.forEach(function (yearData) {
+      measurements.push(yearData['Glob']);
+      measurements.push(yearData['NHem']);
+      measurements.push(yearData['SHem']);
+
+      measurements.push(yearData['24N-90N']);
+      measurements.push(yearData['24S-24N']);
+      measurements.push(yearData['90S-24S']);
+
+      measurements.push(yearData['64N-90N']);
+      measurements.push(yearData['44N-64N']);
+      measurements.push(yearData['24N-44N']);
+      measurements.push(yearData['EQU-24N']);
+      measurements.push(yearData['24S-EQU']);
+      measurements.push(yearData['44S-24S']);
+      measurements.push(yearData['64S-44S']);
+      measurements.push(yearData['90S-64S']);
+    });
+    var min = Math.min.apply(null, measurements);
+    var max = Math.max.apply(null, measurements);
+ console.log("min", min);
+console.log("max", max);
+
+    function normalize(n) {
+      var a = 1 / (max-min);
+      var b = - a * min;
+       
+      // linear function y=a*x+b
+      return a * n + b;
+    }
+
+    function getColor(num) {
+      
+      //num = num * 1000;
+      //num >>>= 0;
+      //var b = num & 0xFF,
+      //    g = (num & 0xFF00) >>> 8,
+      //    r = (num & 0xFF0000) >>> 16,
+      //    a = ( (num & 0xFF000000) >>> 24 ) / 255 ;
+    
+      var b = '00';      
+      var g = '00';      
+      var r = '255';
+      var a = normalize(num);    
+  
+      return "rgba(" + [r, g, b, a].join(",") + ")";
+    }
+
+    var chart = document.getElementById("chart");
+    chart.setAttribute("style", "width: "+4*data.length+"px;");   
+    
+    function draw(parts) {
+      chart.innerHTML = "";
+      var img = document.createElement("img");
+      img.setAttribute("src", "http://www.globe.gov/globe-gov-home-portlet/images/GLOBE_DetailMap2.png");
+      chart.appendChild(img);
+
+      data.forEach(function (yearData) {
+        var bar = document.createElement("div");
+        bar.setAttribute("class", "bar tool");
+        bar.setAttribute("tooltip", yearData.Year);
+        
+        parts.forEach(function (part, index) {        
+          var partBar = document.createElement("div");
+          partBar.setAttribute("class", "part-bar");
+          partBar.setAttribute("style", [
+            "background-color: "+getColor(yearData[part])+";",
+            "height: "+(300/parts.length)+"px;"          
+          ].join(""));
+          bar.appendChild(partBar);
+                  
+          //console.log(yearData);
+        });
+
+        chart.appendChild(bar);
+      });
+    }
+
+    draw(['NHem', "SHem"]);
+  </script>
+</body>
+</html>
