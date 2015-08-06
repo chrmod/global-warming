@@ -5,6 +5,12 @@
   <title>Global Temperature</title>
   <script src="ExcelFormattedGISTEMPData2JS.js"></script>
   <style>
+    h1 {
+      text-align: center;
+    }
+    h2 {
+      text-align: center;
+    }
     #chart {
       position: relative;
       margin: 50px auto auto auto;
@@ -67,6 +73,8 @@
   </style>
 </head>
 <body>
+  <h1>Global warming</h1>
+  <h2>average temerature anomalies year by year</h2>
   <div id="chart"></div>
   <br/><br/>
   <div class="center">
@@ -97,8 +105,6 @@
     });
     var min = Math.min.apply(null, measurements);
     var max = Math.max.apply(null, measurements);
- console.log("min", min);
-console.log("max", max);
 
     function normalize(n) {
       var a = 1 / (max-min);
@@ -109,14 +115,6 @@ console.log("max", max);
     }
 
     function getColor(num) {
-      
-      //num = num * 1000;
-      //num >>>= 0;
-      //var b = num & 0xFF,
-      //    g = (num & 0xFF00) >>> 8,
-      //    r = (num & 0xFF0000) >>> 16,
-      //    a = ( (num & 0xFF000000) >>> 24 ) / 255 ;
-    
       var b = '00';      
       var g = '00';      
       var r = '255';
@@ -147,15 +145,13 @@ console.log("max", max);
             "height: "+(300/parts.length)+"px;"          
           ].join(""));
           bar.appendChild(partBar);
-                  
-          //console.log(yearData);
         });
 
         chart.appendChild(bar);
       });
     }
 
-    draw(['NHem', "SHem"]);
+    draw(["Glob"]);
   </script>
 </body>
 </html>
