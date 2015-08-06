@@ -8,22 +8,42 @@
     h1 {
       text-align: center;
     }
+
     h2 {
       text-align: center;
     }
-    #chart {
+
+    #container {
       position: relative;
       margin: 50px auto auto auto;
       border: 1px solid black;
       height: 300px;
+      margin-bottom: 40px;
     }
 
-    #chart img {
+    #container img {
       position: absolute;
       width: 100%;
       height: 100%;
       filter: grayscale(100%);
       opacity: 0.3;
+      display: none;
+    }
+
+    #y-label {
+      width: 100px;
+      position: absolute;
+      left: -110px;
+      height: 100%;
+      text-align: right;
+    }
+
+    #x-label {
+      width: 100%;
+      position: absolute;
+      top: 310px;
+      height: 50px;
+      padding-left: 15px; /* bad bad bad */
     }
 
     .bar {
@@ -69,13 +89,23 @@
     .tool:hover::before {
         opacity: 1;
         bottom: -35px;
-    }
+        
+     }
   </style>
 </head>
 <body>
   <h1>Global warming</h1>
-  <h2>average temerature anomalies year by year</h2>
-  <div id="chart"></div>
+  <h2>average temperature anomalies year by year</h2>
+
+  
+  <div id="container">
+    <img src="http://www.globe.gov/globe-gov-home-portlet/images/GLOBE_DetailMap2.png"/>
+    <div id="y-label"></div>
+    <div id="x-label"></div>
+    <div id="chart"></div>
+  </div>
+  
+
   <br/><br/>
   <div class="center">
     <button onclick="draw(['Glob']);">global</button>
@@ -123,15 +153,43 @@
       return "rgba(" + [r, g, b, a].join(",") + ")";
     }
 
+
+    
+    var container = document.getElementById("container");
+    container.setAttribute("style", "width: "+4*data.length+"px;");   
+
     var chart = document.getElementById("chart");
-    chart.setAttribute("style", "width: "+4*data.length+"px;");   
+
+    var yLabel = document.getElementById("y-label");
+    var xLabel = document.getElementById("x-label");
     
     function draw(parts) {
       chart.innerHTML = "";
-      var img = document.createElement("img");
-      img.setAttribute("src", "http://www.globe.gov/globe-gov-home-portlet/images/GLOBE_DetailMap2.png");
-      chart.appendChild(img);
+      yLabel.innerHTML = "";
+      xLabel.innerHTML = "";
+      
+      // Y Label
+      parts.forEach(function (part, index) { 
+        var partLegend = document.createElement("div");
+        partLegend.setAttribute("style", [
+          "height: "+(300/parts.length)+"px;",
+          "line-height: "+(300/parts.length)+"px;",         
+        ].join(""));
+        partLegend.innerHTML = part;
+        yLabel.appendChild(partLegend);
+      });
 
+      // X Label
+
+      data.forEach(function (yearData, index) {
+        var yearLegend = document.createElement("span");
+        yearLegend.innerHTML = yearData.Year+" ";
+        if(index % 13 === 0) {
+          xLabel.appendChild(yearLegend);
+        }
+      });
+
+      // Chart 
       data.forEach(function (yearData) {
         var bar = document.createElement("div");
         bar.setAttribute("class", "bar tool");
